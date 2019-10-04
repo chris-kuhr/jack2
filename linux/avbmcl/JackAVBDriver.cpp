@@ -159,8 +159,8 @@ bool JackAVBDriver::Initialize()
     JackDriver::NotifySampleRate(avb_ctx.sample_rate);
 
 
-
-	pthread_create(&(avb_ctx).rxThread, NULL, receiverThread, (void *)(avb_driver_state_t*)&avb_ctx);
+    avb_driver_state_t* p_avb_ctx = &avb_ctx;
+	pthread_create(&(avb_ctx).rxThread, NULL, receiverThread, (void *)p_avb_ctx);
 
 
     return true;

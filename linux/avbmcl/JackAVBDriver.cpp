@@ -164,7 +164,7 @@ bool JackAVBDriver::Initialize()
     return true;
 }
 
-void* JackAVBDriver::receiverThread(void *v_avb_ctx)
+void JackAVBDriver::receiverThread(void *v_avb_ctx)
 {
     avb_driver_state_t *thread_avb_ctx = (avb_driver_state_t*)v_avb_ctx;
     uint64_t cumulative_rx_int_ns = 0;

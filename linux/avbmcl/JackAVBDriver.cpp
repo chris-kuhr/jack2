@@ -180,7 +180,7 @@ int JackAVBDriver::Read()
 
         JackDriver::CycleTakeBeginTime();
 
-        if ( ret ) return -1;
+        //if ( ret ) return -1;
 
         while (node != NULL) {
             jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;

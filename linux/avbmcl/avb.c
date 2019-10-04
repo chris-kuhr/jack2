@@ -389,7 +389,7 @@ void* receiverThread(void *v_avb_ctx)
     while(rxthread_running){
         for(n=0; n<t_avb_ctx->num_packets; n++){
             cumulative_rx_int_ns += await_avtp_rx_ts( t_avb_ctx, n );
-    //        jack_log("duration: %lld", cumulative_rx_int_ns);
+            jack_log("duration: %lld", cumulative_rx_int_ns);
         }
         t_avb_ctx->newPeriodTriggerTime = cumulative_rx_int_ns;
         cumulative_rx_int_ns = 0;

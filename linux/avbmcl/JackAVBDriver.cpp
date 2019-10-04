@@ -138,6 +138,7 @@ bool JackAVBDriver::Initialize()
     jack_log("JackAVBDriver::Init");
     FreePorts();
 
+    this->n = 0;
     //display some additional infos
     printf("AVB driver started\n");
 
@@ -167,15 +168,16 @@ int JackAVBDriver::Read()
     JSList *node = avb_ctx.capture_ports;
     uint64_t cumulative_rx_int_ns = 0;
 
+    if(this->n == 0) JackDriver::CycleTakeBeginTime();
     this->n++;
-    cumulative_rx_int_ns += await_avtp_rx_ts( &avb_ctx, this->n );
 
+
+    cumulative_rx_int_ns += await_avtp_rx_ts( &avb_ctx, n );
 //        jack_log("duration: %lld", cumulative_rx_int_ns);
 
 
-
-    if( this->n == avb_ctx.num_packets ){
-        this->n=0;
+    if( n == avb_ctx.num_packets ) {
+        n=0;
         float cumulative_rx_int_us = cumulative_rx_int_ns / 1000;
         if ( cumulative_rx_int_us > avb_ctx.period_usecs) {
             ret = 1;
@@ -183,7 +185,6 @@ int JackAVBDriver::Read()
             jack_error("netxruns... duration: %fms", cumulative_rx_int_us / 1000);
         }
 
-        JackDriver::CycleTakeBeginTime();
 
         if ( ret ) return -1;
 
@@ -195,11 +196,11 @@ int JackAVBDriver::Read()
             node = jack_slist_next (node);
         }
 
-        return 0;
+        JackDriver::CycleTakeEndTime();
     } else {
-        return -1;
+        JackDriver::CycleIncTime();
     }
-
+    return 0;
 }
 
 int JackAVBDriver::Write()

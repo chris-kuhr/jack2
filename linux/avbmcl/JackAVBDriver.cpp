@@ -169,12 +169,11 @@ int JackAVBDriver::Read()
     int n = 0;
 
 
-    JackDriver::CycleTakeBeginTime();
 
     for(n=0; n<avb_ctx.num_packets; n++){
         cumulative_rx_int_ns += await_avtp_rx_ts( &avb_ctx, n );
 
-//        jack_log("duration: %lld", cumulative_rx_int_ns);
+        jack_log("duration: %lld", cumulative_rx_int_ns);
     }
 
     float cumulative_rx_int_us = cumulative_rx_int_ns / 1000;
@@ -185,10 +184,9 @@ int JackAVBDriver::Read()
     }
 
 
-    if ( ret ){
-        JackDriver::CycleTakeEndTime();
-        return -1;
-    }
+    JackDriver::CycleTakeBeginTime();
+
+    if ( ret ) return -1;
 
     while (node != NULL) {
         jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
@@ -197,7 +195,6 @@ int JackAVBDriver::Read()
         //memcpy(buf, 0, avb_ctx.period_size * sizeof(jack_default_audio_sample_t));
         node = jack_slist_next (node);
     }
-    JackDriver::CycleTakeEndTime();
     return 0;
 }
 

@@ -182,12 +182,12 @@ int JackAVBDriver::Read()
 
     JackDriver::CycleTakeBeginTime();
 
-    //if ( ret ) return -1;
+    if ( ret ) return -1;
 
     while (node != NULL) {
         jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
         JackPort *port = fGraphManager->GetPort(port_index);
-        jack_default_audio_sample_t* buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_index, fEngineControl->fBufferSize);
+        jack_default_audio_sample_t* buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_index, 0);//fEngineControl->fBufferSize);
         //memcpy(buf, 0, avb_ctx.period_size * sizeof(jack_default_audio_sample_t));
         node = jack_slist_next (node);
     }

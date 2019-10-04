@@ -31,8 +31,6 @@ class JackAVBDriver : public JackWaiterDriver
     private:
         avb_driver_state_t 	avb_ctx;
         int 				num_packets_even_odd;
-        uint64_t            cumulative_rx_int_ns;
-        int                 n;
 
     public:
         JackAVBDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,

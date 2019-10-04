@@ -158,13 +158,13 @@ bool JackAVBDriver::Initialize()
     JackDriver::NotifyBufferSize(avb_ctx.period_size);
     JackDriver::NotifySampleRate(avb_ctx.sample_rate);
 
-	pthread_create(&(avb_ctx).rxThread, NULL, receiverThread, &avb_ctx);
+	pthread_create(&(avb_ctx).rxThread, NULL, receiverThread,(void*)&avb_ctx);
 
 
     return true;
 }
 
-void JackAVBDriver::receiverThread(void *v_avb_ctx)
+static void* JackAVBDriver::receiverThread(void *v_avb_ctx)
 {
     avb_driver_state_t *thread_avb_ctx = (avb_driver_state_t*)v_avb_ctx;
     uint64_t cumulative_rx_int_ns = 0;

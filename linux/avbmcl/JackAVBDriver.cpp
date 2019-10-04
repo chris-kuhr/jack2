@@ -168,10 +168,12 @@ int JackAVBDriver::Read()
     uint64_t cumulative_rx_int_ns = 0;
     int n = 0;
 
-    JackDriver::CycleTakeEndTime();
+
+    JackDriver::CycleTakeBeginTime();
+
     for(n=0; n<avb_ctx.num_packets; n++){
         cumulative_rx_int_ns += await_avtp_rx_ts( &avb_ctx, n );
-        JackDriver::CycleIncTime();
+
 //        jack_log("duration: %lld", cumulative_rx_int_ns);
     }
 
@@ -181,9 +183,12 @@ int JackAVBDriver::Read()
         NotifyXRun(fBeginDateUst, cumulative_rx_int_us);
         jack_error("netxruns... duration: %fms", cumulative_rx_int_us / 1000);
     }
-    JackDriver::CycleTakeBeginTime();
 
-    if ( ret ) return -1;
+
+    if ( ret ){
+        JackDriver::CycleTakeEndTime();
+        return -1;
+    }
 
     while (node != NULL) {
         jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
@@ -192,6 +197,7 @@ int JackAVBDriver::Read()
         //memcpy(buf, 0, avb_ctx.period_size * sizeof(jack_default_audio_sample_t));
         node = jack_slist_next (node);
     }
+    JackDriver::CycleTakeEndTime();
     return 0;
 }
 

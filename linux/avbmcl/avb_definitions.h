@@ -121,6 +121,7 @@ struct _avb_driver_state {
     struct ifreq if_idx;
     struct ifreq if_mac;
 
+    pthread_t thread;
     pthread_t rxThread;
     pthread_mutex_t threadLock;
     pthread_cond_t dataReady;

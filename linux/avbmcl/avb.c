@@ -437,16 +437,6 @@ int init_avb_driver( avb_driver_state_t *avb_ctx, const char* name,
     }
 
 
-    avb_ctx->newPeriodTriggerTime = 0;
-
-    if( pthread_create( &avb_ctx->rxThread, NULL, (&receiverThread), (void*) avb_ctx ) != 0 ) {
-        fprintf(filepointer,  "Error creating Rx Thread\n");fflush(filepointer);
-        fclose(filepointer);
-        return -1; // EXIT_FAILURE
-    } else {
-        fprintf(filepointer,  "Success creating Rx Thread\n");fflush(filepointer);
-    }
-
     fprintf(filepointer, "JackAVBDriver::JackAVBPDriver Ethernet Device %s\n", name);fflush(filepointer);
     fprintf(filepointer, "Stream ID: %02x %02x %02x %02x %02x %02x %02x %02x\n",
                                                         (uint8_t) stream_id[0],
@@ -467,6 +457,7 @@ int init_avb_driver( avb_driver_state_t *avb_ctx, const char* name,
     avb_ctx->playback_channels = playback_ports;
     avb_ctx->capture_channels = capture_ports;
     avb_ctx->adjust = adjust;
+    avb_ctx->newPeriodTriggerTime = 0;
     avb_ctx->sample_rate = sample_rate;
     avb_ctx->period_size = period_size;
     avb_ctx->period_usecs = (uint64_t) ((float)period_size / (float)sample_rate * 1000000);
@@ -495,6 +486,7 @@ int init_avb_driver( avb_driver_state_t *avb_ctx, const char* name,
         fclose(filepointer);
         return -1; // EXIT_FAILURE
     }
+
     return 0; // EXIT_SUCCESS
 }
 
@@ -506,6 +498,16 @@ int startup_avb_driver( avb_driver_state_t *avb_ctx )
         fclose(filepointer);
         return -1; // EXIT_FAILURE
     } else {
+
+        if( pthread_create( &avb_ctx->rxThread, NULL, (&receiverThread), (void*) avb_ctx ) != 0 ) {
+            fprintf(filepointer,  "Error creating Rx Thread\n");fflush(filepointer);
+            fclose(filepointer);
+            return -1; // EXIT_FAILURE
+        } else {
+            fprintf(filepointer,  "Success creating Rx Thread\n");fflush(filepointer);
+        }
+
+
         return 0; // EXIT_SUCCESS
     }
 }

@@ -192,9 +192,10 @@ int JackAVBDriver::Read()
             //memcpy(buf, 0, avb_ctx.period_size * sizeof(jack_default_audio_sample_t));
             node = jack_slist_next (node);
         }
-    } else {
-        JackDriver::CycleIncTime();
     }
+//    else {
+//        JackDriver::CycleIncTime();
+//    }
     return 0;
 }
 

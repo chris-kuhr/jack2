@@ -158,28 +158,10 @@ bool JackAVBDriver::Initialize()
     JackDriver::NotifyBufferSize(avb_ctx.period_size);
     JackDriver::NotifySampleRate(avb_ctx.sample_rate);
 
-	pthread_create(&(avb_ctx).rxThread, NULL, (&Jack::JackAVBDriver::receiverThread),(void*)&avb_ctx);
-
 
     return true;
 }
 
-static void* JackAVBDriver::receiverThread(void *v_avb_ctx)
-{
-    avb_driver_state_t *thread_avb_ctx = (avb_driver_state_t*)v_avb_ctx;
-    uint64_t cumulative_rx_int_ns = 0;
-    int n = 0;
-
-    while(1){
-        for(n=0; n<thread_avb_ctx->num_packets; n++){
-            cumulative_rx_int_ns += await_avtp_rx_ts( thread_avb_ctx, n );
-    //        jack_log("duration: %lld", cumulative_rx_int_ns);
-        }
-        thread_avb_ctx->newPeriodTriggerTime = cumulative_rx_int_ns;
-        cumulative_rx_int_ns = 0;
-    }
-	pthread_join (thread_avb_ctx->rxThread, NULL);
-}
 
 
 int JackAVBDriver::Read()

@@ -389,6 +389,22 @@ void *worker_thread_mrp(void* v_avb_ctx)
     pthread_exit(0);
 }
 
+void* receiverThread(void *v_avb_ctx)
+{
+    avb_driver_state_t *t_avb_ctx = (avb_driver_state_t*)v_avb_ctx;
+    uint64_t cumulative_rx_int_ns = 0;
+    int n = 0;
+
+    while(1){
+        for(n=0; n<t_avb_ctx->num_packets; n++){
+            cumulative_rx_int_ns += await_avtp_rx_ts( t_avb_ctx, n );
+    //        jack_log("duration: %lld", cumulative_rx_int_ns);
+        }
+        t_avb_ctx->newPeriodTriggerTime = cumulative_rx_int_ns;
+        cumulative_rx_int_ns = 0;
+    }
+    pthread_exit(0);
+}
 // AVB Backend
 int init_avb_driver( avb_driver_state_t *avb_ctx, const char* name,
                         char* stream_id, char* destination_mac,
@@ -413,11 +429,22 @@ int init_avb_driver( avb_driver_state_t *avb_ctx, const char* name,
     }
 
     if( pthread_create( &avb_ctx->thread, NULL, (&worker_thread_mrp), (void*) avb_ctx ) != 0 ) {
-        fprintf(filepointer,  "Error creating thread\n");fflush(filepointer);
+        fprintf(filepointer,  "Error creating MRP thread\n");fflush(filepointer);
         fclose(filepointer);
         return -1; // EXIT_FAILURE
     } else {
-        fprintf(filepointer,  "Success creating thread\n");fflush(filepointer);
+        fprintf(filepointer,  "Success creating MRP thread\n");fflush(filepointer);
+    }
+
+
+    avb_ctx->newPeriodTriggerTime = 0;
+
+    if( pthread_create( &avb_ctx->rxThread, NULL, (&receiverThread), (void*) avb_ctx ) != 0 ) {
+        fprintf(filepointer,  "Error creating Rx Thread\n");fflush(filepointer);
+        fclose(filepointer);
+        return -1; // EXIT_FAILURE
+    } else {
+        fprintf(filepointer,  "Success creating Rx Thread\n");fflush(filepointer);
     }
 
     fprintf(filepointer, "JackAVBDriver::JackAVBPDriver Ethernet Device %s\n", name);fflush(filepointer);
@@ -441,7 +468,6 @@ int init_avb_driver( avb_driver_state_t *avb_ctx, const char* name,
     avb_ctx->capture_channels = capture_ports;
     avb_ctx->adjust = adjust;
     avb_ctx->sample_rate = sample_rate;
-    avb_ctx->newPeriodTriggerTime = 0;
     avb_ctx->period_size = period_size;
     avb_ctx->period_usecs = (uint64_t) ((float)period_size / (float)sample_rate * 1000000);
     avb_ctx->num_packets = (int)( avb_ctx->period_size / 6 ) + 1;

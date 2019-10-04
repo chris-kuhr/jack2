@@ -171,6 +171,7 @@ int JackAVBDriver::Read()
     JackDriver::CycleTakeEndTime();
     for(n=0; n<avb_ctx.num_packets; n++){
         cumulative_rx_int_ns += await_avtp_rx_ts( &avb_ctx, n );
+        JackDriver::CycleIncTime();
 //        jack_log("duration: %lld", cumulative_rx_int_ns);
     }
 

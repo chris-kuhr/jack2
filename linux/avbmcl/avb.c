@@ -441,6 +441,7 @@ int init_avb_driver( avb_driver_state_t *avb_ctx, const char* name,
     avb_ctx->capture_channels = capture_ports;
     avb_ctx->adjust = adjust;
     avb_ctx->sample_rate = sample_rate;
+    avb_ctx->newPeriodTriggerTime = 0;
     avb_ctx->period_size = period_size;
     avb_ctx->period_usecs = (uint64_t) ((float)period_size / (float)sample_rate * 1000000);
     avb_ctx->num_packets = (int)( avb_ctx->period_size / 6 ) + 1;

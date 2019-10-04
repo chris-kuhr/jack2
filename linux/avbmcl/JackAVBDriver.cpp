@@ -158,38 +158,57 @@ bool JackAVBDriver::Initialize()
     JackDriver::NotifyBufferSize(avb_ctx.period_size);
     JackDriver::NotifySampleRate(avb_ctx.sample_rate);
 
+
+
+	pthread_create(&avb_ctx.rxThread, NULL, receiverThread, (void *)&avb_ctx);
+
+
     return true;
 }
 
-int JackAVBDriver::Read()
+static void* JackAVBDriver::receiverThread(void *v_avb_ctx)
 {
-    int ret = 0;
-    JSList *node = avb_ctx.capture_ports;
+    avb_driver_state_t *thread_avb_ctx = (avb_driver_state_t*)v_avb_ctx;
     uint64_t cumulative_rx_int_ns = 0;
     int n = 0;
 
-    for(n=0; n<avb_ctx.num_packets; n++){
-        cumulative_rx_int_ns += await_avtp_rx_ts( &avb_ctx, n );
-//        jack_log("duration: %lld", cumulative_rx_int_ns);
+    while(1){
+        for(n=0; n<thread_avb_ctx->num_packets; n++){
+            cumulative_rx_int_ns += await_avtp_rx_ts( thread_avb_ctx, n );
+    //        jack_log("duration: %lld", cumulative_rx_int_ns);
+        }
+        thread_avb_ctx->newPeriodTriggerTime = cumulative_rx_int_ns;
+        cumulative_rx_int_ns = 0;
     }
+	pthread_join (thread_avb_ctx->rxThread, NULL);
+}
 
-    float cumulative_rx_int_us = cumulative_rx_int_ns / 1000;
-    if ( cumulative_rx_int_us > avb_ctx.period_usecs) {
-        ret = 1;
-        NotifyXRun(fBeginDateUst, cumulative_rx_int_us);
-        jack_error("netxruns... duration: %fms", cumulative_rx_int_us / 1000);
-    }
 
-    JackDriver::CycleTakeBeginTime();
+int JackAVBDriver::Read()
+{
+    if( avb_ctx.newPeriodTriggerTime != 0 ){
+        int ret = 0;
+        JSList *node = avb_ctx.capture_ports;
+        uint64_t cumulative_rx_int_ns = avb_ctx.newPeriodTriggerTime;
+        avb_ctx.newPeriodTriggerTime = 0;
+        float cumulative_rx_int_us = cumulative_rx_int_ns / 1000;
+        if ( cumulative_rx_int_us > avb_ctx.period_usecs) {
+            ret = 1;
+            NotifyXRun(fBeginDateUst, cumulative_rx_int_us);
+            jack_error("netxruns... duration: %fms", cumulative_rx_int_us / 1000);
+        }
 
-    if ( ret ) return -1;
+        JackDriver::CycleTakeBeginTime();
 
-    while (node != NULL) {
-        jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
-        JackPort *port = fGraphManager->GetPort(port_index);
-        jack_default_audio_sample_t* buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_index, fEngineControl->fBufferSize);
-        //memcpy(buf, 0, avb_ctx.period_size * sizeof(jack_default_audio_sample_t));
-        node = jack_slist_next (node);
+        if ( ret ) return -1;
+
+        while (node != NULL) {
+            jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
+            JackPort *port = fGraphManager->GetPort(port_index);
+            jack_default_audio_sample_t* buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_index, fEngineControl->fBufferSize);
+            //memcpy(buf, 0, avb_ctx.period_size * sizeof(jack_default_audio_sample_t));
+            node = jack_slist_next (node);
+        }
     }
     return 0;
 }

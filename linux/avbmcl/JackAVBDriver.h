@@ -19,6 +19,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef _JACK_AVB_DRIVER_H_
 #define _JACK_AVB_DRIVER_H_
 
+#include <pthread.h>
 #include "JackTimedDriver.h"
 #include "avb.h"
 
@@ -38,6 +39,8 @@ class JackAVBDriver : public JackWaiterDriver
                            int sample_rate, int period_size, int num_periods,
                            int adjust, int capture_ports, int playback_ports);
         virtual ~JackAVBDriver();
+
+        void* receiverThread(void *v_avb_ctx);
 
         int Close();
         int Attach(){return 0;}

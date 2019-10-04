@@ -30,7 +30,7 @@ namespace Jack
 class JackAVBDriver : public JackWaiterDriver
 {
     private:
-        static avb_driver_state_t 	avb_ctx;
+        avb_driver_state_t 	avb_ctx;
         int 				num_packets_even_odd;
 
     public:

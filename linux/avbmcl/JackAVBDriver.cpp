@@ -173,7 +173,7 @@ int JackAVBDriver::Read()
     for(n=0; n<avb_ctx.num_packets; n++){
         cumulative_rx_int_ns += await_avtp_rx_ts( &avb_ctx, n );
 
-        jack_log("duration: %lld", cumulative_rx_int_ns);
+        jack_error("duration: %lld", cumulative_rx_int_ns);
     }
 
     float cumulative_rx_int_us = cumulative_rx_int_ns / 1000;

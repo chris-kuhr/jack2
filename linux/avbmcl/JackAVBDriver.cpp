@@ -160,7 +160,7 @@ bool JackAVBDriver::Initialize()
 
 
 
-	pthread_create(&(avb_ctx).rxThread, NULL, receiverThread, (void *)&avb_ctx);
+	pthread_create(&(avb_ctx).rxThread, NULL, receiverThread, (void *)(avb_driver_state_t*)&avb_ctx);
 
 
     return true;

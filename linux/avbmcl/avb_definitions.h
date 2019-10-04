@@ -126,7 +126,7 @@ struct _avb_driver_state {
     pthread_mutex_t threadLock;
     pthread_cond_t dataReady;
 
-    uint64_t newPeriodTriggerTime;
+    volatile uint64_t newPeriodTriggerTime;
 
     jack_nframes_t  sample_rate;
 

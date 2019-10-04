@@ -71,6 +71,7 @@ JackAVBDriver::JackAVBDriver(const char* name, const char* alias, JackLockedEngi
                                         (uint8_t) destination_mac[4],
                                         (uint8_t) destination_mac[5]);
     num_packets_even_odd = 0; // even = 0, odd = 1
+    cumulative_rx_int_ns = 0;
 
     init_avb_driver( &(this->avb_ctx),
                       eth_dev,
@@ -165,29 +166,25 @@ bool JackAVBDriver::Initialize()
 int JackAVBDriver::Read()
 {
     int ret = 0;
-    JSList *node = avb_ctx.capture_ports;
-    uint64_t cumulative_rx_int_ns = 0;
-
-    if(this->n == 0) JackDriver::CycleTakeBeginTime();
     this->n++;
 
-
-    cumulative_rx_int_ns += await_avtp_rx_ts( &avb_ctx, n );
+    this->cumulative_rx_int_ns += await_avtp_rx_ts( &avb_ctx, n );
 //        jack_log("duration: %lld", cumulative_rx_int_ns);
 
-
-    if( n == avb_ctx.num_packets ) {
-        n=0;
-        float cumulative_rx_int_us = cumulative_rx_int_ns / 1000;
+    if( this->n == avb_ctx.num_packets ) {
+        this->n=0;
+        float cumulative_rx_int_us = this->cumulative_rx_int_ns / 1000;
+        this->cumulative_rx_int_ns = 0;
         if ( cumulative_rx_int_us > avb_ctx.period_usecs) {
             ret = 1;
             NotifyXRun(fBeginDateUst, cumulative_rx_int_us);
             jack_error("netxruns... duration: %fms", cumulative_rx_int_us / 1000);
         }
-
+        JackDriver::CycleTakeBeginTime();
 
         if ( ret ) return -1;
 
+        JSList *node = avb_ctx.capture_ports;
         while (node != NULL) {
             jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
             JackPort *port = fGraphManager->GetPort(port_index);
@@ -195,8 +192,6 @@ int JackAVBDriver::Read()
             //memcpy(buf, 0, avb_ctx.period_size * sizeof(jack_default_audio_sample_t));
             node = jack_slist_next (node);
         }
-
-        JackDriver::CycleTakeEndTime();
     } else {
         JackDriver::CycleIncTime();
     }

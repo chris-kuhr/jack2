@@ -30,6 +30,7 @@ FILE* filepointer;
 int shm_fd;
 mrp_ctx_t *mrp_ctx;
 volatile int mrp_running = 1;
+volatile int rxthread_running = 1;
 struct sockaddr_in *si_other_avb = NULL;
 struct pollfd *avtp_transport_socket_fds = NULL;
 
@@ -348,16 +349,6 @@ int mrp_thread(avb_driver_state_t **avb_ctx)
             }
         }
 
-
-
-
-
-
-
-
-
-
-
         nanosleep(&tim , &tim2);
     }
 
@@ -395,7 +386,7 @@ void* receiverThread(void *v_avb_ctx)
     uint64_t cumulative_rx_int_ns = 0;
     int n = 0;
 
-    while(1){
+    while(rxthread_running){
         for(n=0; n<t_avb_ctx->num_packets; n++){
             cumulative_rx_int_ns += await_avtp_rx_ts( t_avb_ctx, n );
     //        jack_log("duration: %lld", cumulative_rx_int_ns);
@@ -527,6 +518,8 @@ int shutdown_avb_driver( avb_driver_state_t *avb_ctx )
 
     mrp_running = 0;
     pthread_join(avb_ctx->thread, NULL);
+    rxthread_running = 0;
+    pthread_join(avb_ctx->rxThread, NULL);
     mrp_shm_close( 1 );
     avtp_mcl_delete( filepointer, &avb_ctx );
     fclose(filepointer);

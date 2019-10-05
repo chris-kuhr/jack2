@@ -31,6 +31,9 @@ class JackAVBDriver : public JackWaiterDriver
     private:
         avb_driver_state_t 	avb_ctx;
         int 				num_packets_even_odd;
+        uint64_t            received_lastPacket;
+        uint64_t            timeCompensation;
+        uint64_t            monotonicTime;
 
     public:
         JackAVBDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,

@@ -71,6 +71,9 @@ JackAVBDriver::JackAVBDriver(const char* name, const char* alias, JackLockedEngi
                                         (uint8_t) destination_mac[4],
                                         (uint8_t) destination_mac[5]);
     num_packets_even_odd = 0; // even = 0, odd = 1
+    received_lastPacket = 0;
+    timeCompensation = 0;
+    monotonicTime = 0;
 
     init_avb_driver( &(this->avb_ctx),
                       eth_dev,
@@ -172,16 +175,30 @@ int JackAVBDriver::Read()
 
     for(n=0; n<avb_ctx.num_packets; n++){
         cumulative_rx_int_ns += await_avtp_rx_ts( &avb_ctx, n );
-
-        jack_error("duration: %lld", cumulative_rx_int_ns);
+        if( n == 0 ){
+            cumulative_rx_int_ns -= this->timeCompensation;
+        }
+        //jack_errors("duration: %lld", cumulative_rx_int_ns);
     }
+    this->monotonicTime += cumulative_rx_int_ns;
+
+    if( this->received_lastPacket != 0 ){
+        this->timeCompensation = cumulative_rx_int_ns - this->received_lastPacket;
+    }
+    this->received_lastPacket = cumulative_rx_int_ns;
+
+
+
+
+
 
     float cumulative_rx_int_us = cumulative_rx_int_ns / 1000;
-    if ( cumulative_rx_int_us > avb_ctx.period_usecs) {
+    if ( cumulative_rx_int_us > ( avb_ctx.period_usecs + avb_ctx.period_usecs*0.005 ) ) {
         ret = 1;
         NotifyXRun(fBeginDateUst, cumulative_rx_int_us);
         jack_error("netxruns... duration: %fms", cumulative_rx_int_us / 1000);
     }
+
 
 
     JackDriver::CycleTakeBeginTime();

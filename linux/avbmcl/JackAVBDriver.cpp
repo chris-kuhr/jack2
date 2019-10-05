@@ -71,9 +71,10 @@ JackAVBDriver::JackAVBDriver(const char* name, const char* alias, JackLockedEngi
                                         (uint8_t) destination_mac[4],
                                         (uint8_t) destination_mac[5]);
     num_packets_even_odd = 0; // even = 0, odd = 1
-    received_lastPacket = 0;
+    lastPeriodDuration = 0;
     timeCompensation = 0;
     monotonicTime = 0;
+    preRunCnt = 3;
 
     init_avb_driver( &(this->avb_ctx),
                       eth_dev,
@@ -175,17 +176,17 @@ int JackAVBDriver::Read()
 
     for(n=0; n<avb_ctx.num_packets; n++){
         cumulative_rx_int_ns += await_avtp_rx_ts( &avb_ctx, n );
-        if( n == 0 ){
+        if( n == 0 && --this->preRunCnt >= 0 ){
             cumulative_rx_int_ns -= this->timeCompensation;
         }
         //jack_errors("duration: %lld", cumulative_rx_int_ns);
     }
     this->monotonicTime += cumulative_rx_int_ns;
 
-    if( this->received_lastPacket != 0 ){
-        this->timeCompensation = cumulative_rx_int_ns - this->received_lastPacket;
+    if( this->lastPeriodDuration != 0 ){
+        this->timeCompensation = cumulative_rx_int_ns - this->lastPeriodDuration;
     }
-    this->received_lastPacket = cumulative_rx_int_ns;
+    this->lastPeriodDuration = cumulative_rx_int_ns;
 
 
 

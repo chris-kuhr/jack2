@@ -187,7 +187,7 @@ int JackAVBDriver::Read()
     this->lastPeriodDuration = cumulative_rx_int_ns;
 
     float cumulative_rx_int_us = cumulative_rx_int_ns / 1000;
-    if ( cumulative_rx_int_us > ( avb_ctx.period_usecs + avb_ctx.period_usecs*0.05 ) ) {
+    if ( cumulative_rx_int_us > ( avb_ctx.period_usecs + avb_ctx.period_usecs*0.1 ) ) {
         ret = 1;
         NotifyXRun(fBeginDateUst, cumulative_rx_int_us);
         jack_error("netxruns... duration: %fms", cumulative_rx_int_us / 1000);

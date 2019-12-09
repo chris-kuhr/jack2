@@ -221,11 +221,11 @@ def configure(conf):
     conf.env.append_unique('CFLAGS', '-Wextra')
     conf.env.append_unique('CFLAGS', '-Wno-parentheses')
     conf.env.append_unique('CFLAGS', '-I/usr/include/')
+    conf.env.append_unique('CFLAGS', '-I/usr/include/x86_64-linux-gnu')
+    conf.env.append_unique('CFLAGS', '-I/home/soundjack/jack2.git.kuhr/linux/avbmcl/headers')
     conf.env.append_unique('CFLAGS', '-I/home/soundjack/jack2.git.kuhr/linux/avbmcl/common/build/usr/include/')
     conf.env.append_unique('CFLAGS', '-I/home/soundjack/jack2.git.kuhr/linux/avbmcl/libbpf/include/')
     conf.env.append_unique('CFLAGS', '-g')
-    conf.env.append_unique('CFLAGS', '-I/usr/include/x86_64-linux-gnu')
-    conf.env.append_unique('CFLAGS', '-I./linux/avbmcl/headers')
     conf.env.append_unique('CFLAGS', '-O2')
     conf.env.append_unique('CFLAGS', '-std=gnu99')
     

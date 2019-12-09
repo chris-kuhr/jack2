@@ -33,7 +33,7 @@ extern "C"
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <ifaddrs.h>
-#include "/home/soundjack/rt-kernel/linux-5.2.17/include/linux/if_packet.h"
+#include "/home/soundjack/rt-kernel/linux-5.2.17/usr/include/linux/if_packet.h"
 #include "/home/soundjack/rt-kernel/linux-5.2.17/include/linux/net_tstamp.h"
 #include "/home/soundjack/rt-kernel/linux-5.2.17/include/linux/sockios.h"
 #include "/home/soundjack/rt-kernel/linux-5.2.17/include/linux/filter.h"

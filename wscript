@@ -218,6 +218,15 @@ def configure(conf):
     conf.env.append_unique('CXXFLAGS', '-Wall')
     conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
     conf.env.append_unique('CFLAGS', '-Wall')
+    conf.env.append_unique('CFLAGS', '-Wextra')
+    conf.env.append_unique('CFLAGS', '-Wno-parentheses')
+    conf.env.append_unique('CFLAGS', '-I./linux/avbmcl/common/build/usr/include/')
+    conf.env.append_unique('CFLAGS', '-g')
+    conf.env.append_unique('CFLAGS', '-I/usr/include/x86_64-linux-gnu')
+    conf.env.append_unique('CFLAGS', '-I./linux/avbmcl/headers')
+    conf.env.append_unique('CFLAGS', '-O2')
+    conf.env.append_unique('CFLAGS', '-std=gnu99')
+    
 
     if conf.env['IS_MACOSX']:
         conf.check(lib='aften', uselib='AFTEN', define_name='AFTEN')
@@ -275,9 +284,14 @@ def configure(conf):
     conf.env['LIB_DL'] = ['dl']
     conf.env['LIB_RT'] = ['rt']
     conf.env['LIB_M'] = ['m']
+    conf.env['LIB_ELF'] = ['elf']
+    conf.env['LIB_BPF'] = [':libbpf.a']
     conf.env['LIB_STDC++'] = ['stdc++']
     conf.env['JACK_API_VERSION'] = JACK_API_VERSION
     conf.env['JACK_VERSION'] = VERSION
+    
+    conf.env.append_unique('LINKFLAGS', '-L./linux/avbmcl/libbpf/src')
+        
 
     conf.env['BUILD_WITH_PROFILE'] = Options.options.profile
     conf.env['BUILD_WITH_32_64'] = Options.options.mixed
@@ -527,6 +541,9 @@ def build_drivers(bld):
     # Non-hardware driver sources. Lexically sorted.
 
     avbmcl_src = [
+        'linux/avbmcl/common/common_libbpf.c',
+        'linux/avbmcl/common/common_params.c',
+        'linux/avbmcl/common/common_user_bpf_xdp.c',
         'linux/avbmcl/JackAVBDriver.cpp',
         'linux/avbmcl/avb.c',
         'linux/avbmcl/avb_sockets.c',

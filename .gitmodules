@@ -1,3 +1,6 @@
 [submodule "linux/avbmcl/OpenAvnu"]
 	path = linux/avbmcl/OpenAvnu
 	url = https://github.com/chris-kuhr/OpenAvnu.git
+[submodule "linux/avbmcl/libbpf"]
+	path = linux/avbmcl/libbpf
+	url = https://github.com/libbpf/libbpf

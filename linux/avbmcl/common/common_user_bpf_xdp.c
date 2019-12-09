@@ -9,7 +9,7 @@
 
 #include <linux/if_link.h> /* Need XDP flags */
 //#include <linux/err.h>
-#include "/usr/src/linux-headers-5.0.0-36/include/err.h"
+#include "/usr/src/linux-headers-5.0.0-36/include/linux/err.h"
 #include "common_defines.h"
 
 #ifndef PATH_MAX

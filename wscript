@@ -749,21 +749,18 @@ def build_drivers(bld):
 
 def build(bld):
     bld(features='c cxx cxxprogram',
-        includes='/home/soundjack/jack2.git.kuhr/linux/avbmcl/', 
+        includes=['/home/soundjack/jack2.git.kuhr/linux/avbmcl/headers', '/home/soundjack/jack2.git.kuhr/linux/avbmcl/common/build/usr/include/', '/home/soundjack/jack2.git.kuhr/linux/avbmcl/libbpf/include/'], 
         source='linux/avbmcl/common/common_libbpf.c',
         target='avbmcl')
     bld(features='c cxx cxxprogram',
-        includes='/home/soundjack/jack2.git.kuhr/linux/avbmcl/',
+        includes=['/home/soundjack/jack2.git.kuhr/linux/avbmcl/headers', '/home/soundjack/jack2.git.kuhr/linux/avbmcl/common/build/usr/include/', '/home/soundjack/jack2.git.kuhr/linux/avbmcl/libbpf/include/'], 
         source='linux/avbmcl/common/common_params.c',
         target='avbmcl')
     bld(features='c cxx cxxprogram',
-        includes='/home/soundjack/jack2.git.kuhr/linux/avbmcl/',
+        includes=['/home/soundjack/jack2.git.kuhr/linux/avbmcl/headers', '/home/soundjack/jack2.git.kuhr/linux/avbmcl/common/build/usr/include/', '/home/soundjack/jack2.git.kuhr/linux/avbmcl/libbpf/include/'], 
         source='linux/avbmcl/common/common_user_bpf_xdp.c', 
         target='avbmcl')
         
-    #conf.env.append_unique('CFLAGS', '-I/home/soundjack/jack2.git.kuhr/linux/avbmcl/headers')
-    #conf.env.append_unique('CFLAGS', '-I/home/soundjack/jack2.git.kuhr/linux/avbmcl/common/build/usr/include/')
-    #conf.env.append_unique('CFLAGS', '-I/home/soundjack/jack2.git.kuhr/linux/avbmcl/libbpf/include/')
 
 
     if not bld.variant and bld.env['BUILD_WITH_32_64']:

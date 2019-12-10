@@ -222,9 +222,6 @@ def configure(conf):
     conf.env.append_unique('CFLAGS', '-Wno-parentheses')
     #conf.env.append_unique('CFLAGS', '-I/usr/include/')
     conf.env.append_unique('CFLAGS', '-I/usr/include/x86_64-linux-gnu')
-    conf.env.append_unique('CFLAGS', '-I/home/soundjack/jack2.git.kuhr/linux/avbmcl/headers')
-    conf.env.append_unique('CFLAGS', '-I/home/soundjack/jack2.git.kuhr/linux/avbmcl/common/build/usr/include/')
-    conf.env.append_unique('CFLAGS', '-I/home/soundjack/jack2.git.kuhr/linux/avbmcl/libbpf/include/')
     conf.env.append_unique('CFLAGS', '-g')
     conf.env.append_unique('CFLAGS', '-O2')
     conf.env.append_unique('CFLAGS', '-std=gnu99')
@@ -543,12 +540,9 @@ def build_drivers(bld):
     # Non-hardware driver sources. Lexically sorted.
 
     avbmcl_src = [
-        'linux/avbmcl/common/common_libbpf.c',
-        'linux/avbmcl/common/common_params.c',
-        'linux/avbmcl/common/common_user_bpf_xdp.c',
         'linux/avbmcl/JackAVBDriver.cpp',
         'linux/avbmcl/avb.c',
-        #'linux/avbmcl/avb_sockets.c',
+        'linux/avbmcl/avb_sockets.c',
         'linux/avbmcl/media_clock_listener.c',
         'linux/avbmcl/mrp_client_control_socket.c',
         'linux/avbmcl/mrp_client_interface.c',
@@ -755,9 +749,21 @@ def build_drivers(bld):
 
 def build(bld):
     bld(features='c cxx cxxprogram',
-        includes='/usr/include/', 
-        source='linux/avbmcl/avb_sockets.c', 
+        includes='/home/soundjack/jack2.git.kuhr/linux/avbmcl/', 
+        source='linux/avbmcl/common/common_libbpf.c',
         target='avbmcl')
+    bld(features='c cxx cxxprogram',
+        includes='/home/soundjack/jack2.git.kuhr/linux/avbmcl/',
+        source='linux/avbmcl/common/common_params.c',
+        target='avbmcl')
+    bld(features='c cxx cxxprogram',
+        includes='/home/soundjack/jack2.git.kuhr/linux/avbmcl/',
+        source='linux/avbmcl/common/common_user_bpf_xdp.c', 
+        target='avbmcl')
+        
+    #conf.env.append_unique('CFLAGS', '-I/home/soundjack/jack2.git.kuhr/linux/avbmcl/headers')
+    #conf.env.append_unique('CFLAGS', '-I/home/soundjack/jack2.git.kuhr/linux/avbmcl/common/build/usr/include/')
+    #conf.env.append_unique('CFLAGS', '-I/home/soundjack/jack2.git.kuhr/linux/avbmcl/libbpf/include/')
 
 
     if not bld.variant and bld.env['BUILD_WITH_32_64']:

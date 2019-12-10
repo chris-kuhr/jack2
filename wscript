@@ -749,7 +749,7 @@ def build_drivers(bld):
 
 def build(bld):
     bld(features='c cxx cxxprogram',
-        includes=['/home/soundjack/jack2.git.kuhr/linux/avbmcl/headers', '/home/soundjack/jack2.git.kuhr/linux/avbmcl/common/build/usr/include/', '/home/soundjack/jack2.git.kuhr/linux/avbmcl/libbpf/include/'], 
+        includes=['/home/soundjack/jack2.git.kuhr/linux/avbmcl/headers', '/home/soundjack/jack2.git.kuhr/linux/avbmcl/common','/home/soundjack/jack2.git.kuhr/linux/avbmcl/common/build/usr/include/', '/home/soundjack/jack2.git.kuhr/linux/avbmcl/libbpf/include/'], 
         source=['linux/avbmcl/common/common_libbpf.c', 'linux/avbmcl/common/common_params.c', 'linux/avbmcl/common/common_user_bpf_xdp.c'],
         target='avbmcl')
 

@@ -220,7 +220,7 @@ def configure(conf):
     conf.env.append_unique('CFLAGS', '-Wall')
     conf.env.append_unique('CFLAGS', '-Wextra')
     conf.env.append_unique('CFLAGS', '-Wno-parentheses')
-    conf.env.append_unique('CFLAGS', '-I/usr/include/')
+    #conf.env.append_unique('CFLAGS', '-I/usr/include/')
     conf.env.append_unique('CFLAGS', '-I/usr/include/x86_64-linux-gnu')
     conf.env.append_unique('CFLAGS', '-I/home/soundjack/jack2.git.kuhr/linux/avbmcl/headers')
     conf.env.append_unique('CFLAGS', '-I/home/soundjack/jack2.git.kuhr/linux/avbmcl/common/build/usr/include/')
@@ -548,7 +548,7 @@ def build_drivers(bld):
         'linux/avbmcl/common/common_user_bpf_xdp.c',
         'linux/avbmcl/JackAVBDriver.cpp',
         'linux/avbmcl/avb.c',
-        'linux/avbmcl/avb_sockets.c',
+        #'linux/avbmcl/avb_sockets.c',
         'linux/avbmcl/media_clock_listener.c',
         'linux/avbmcl/mrp_client_control_socket.c',
         'linux/avbmcl/mrp_client_interface.c',
@@ -754,6 +754,12 @@ def build_drivers(bld):
             source = oss_src)
 
 def build(bld):
+    bld(features='c cxx cxxprogram',
+        includes='/usr/include/', 
+        source='linux/avbmcl/avb_sockets.c', 
+        target='avbmcl')
+
+
     if not bld.variant and bld.env['BUILD_WITH_32_64']:
         Options.commands.append(bld.cmd + '_' + lib32)
 

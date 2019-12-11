@@ -488,7 +488,7 @@ def build_jackd(bld):
         includes = ['.', 'common', 'common/jack'],
         target = 'jackd',
         source = ['common/Jackdmp.cpp'],
-        use = ['serverlib', 'SYSTEMD']
+        use = ['serverlib', 'SYSTEMD','avbmcl']
     )
 
     if bld.env['BUILD_JACKDBUS']:

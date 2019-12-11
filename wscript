@@ -753,7 +753,7 @@ def build(bld):
         source=['linux/avbmcl/common/common_libbpf.c', 'linux/avbmcl/common/common_params.c', 'linux/avbmcl/common/common_user_bpf_xdp.c'],
         
         target='avbmcl',
-        lib=['elf',':libbpf.a'])
+        use=['elf',':libbpf.a'])
 
 
     if not bld.variant and bld.env['BUILD_WITH_32_64']:

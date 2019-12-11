@@ -172,13 +172,12 @@ int JackAVBDriver::Read()
     uint64_t cumulative_rx_int_ns = 0;
     int n = 0;
 
-    for(n=0; n<avb_ctx.num_packets; n++){
-        cumulative_rx_int_ns += await_avtp_rx_ts( &avb_ctx, n );
-        if( n == 0 && --this->preRunCnt >= 0 ){
-            cumulative_rx_int_ns -= this->timeCompensation;
-        }
-        //jack_errors("duration: %lld", cumulative_rx_int_ns);
+    cumulative_rx_int_ns = await_avtp_rx_ts( &avb_ctx, n );
+    if( n == 0 && --this->preRunCnt >= 0 ){
+        cumulative_rx_int_ns -= this->timeCompensation;
     }
+    //jack_errors("duration: %lld", cumulative_rx_int_ns);
+    
     this->monotonicTime += cumulative_rx_int_ns;
 
     if( this->lastPeriodDuration != 0 ){

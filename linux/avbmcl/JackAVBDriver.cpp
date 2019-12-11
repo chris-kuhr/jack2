@@ -173,10 +173,8 @@ int JackAVBDriver::Read()
     int n = 0;
 
     cumulative_rx_int_ns = await_avtp_rx_ts( &avb_ctx, n );
-    if( n == 0 && --this->preRunCnt >= 0 ){
-        cumulative_rx_int_ns -= this->timeCompensation;
-    }
-    //jack_errors("duration: %lld", cumulative_rx_int_ns);
+
+    jack_errors("duration: %lld", cumulative_rx_int_ns);
     
     this->monotonicTime += cumulative_rx_int_ns;
 

@@ -496,7 +496,7 @@ def build_jackd(bld):
         jackd.use += ['DBUS-1']
 
     if bld.env['IS_LINUX']:
-        jackd.use += ['DL', 'M', 'PTHREAD', 'RT', 'STDC++']
+        jackd.use += ['DL', 'M', 'PTHREAD', 'RT', 'STDC++','LIB_BPF','LIB_ELF']
 
     if bld.env['IS_MACOSX']:
         jackd.use += ['DL', 'PTHREAD']

@@ -174,7 +174,7 @@ int JackAVBDriver::Read()
 
     cumulative_rx_int_ns = await_avtp_rx_ts( &avb_ctx, n );
 
-    jack_errors("duration: %lld", cumulative_rx_int_ns);
+    jack_error("duration: %lld", cumulative_rx_int_ns);
     
     this->monotonicTime += cumulative_rx_int_ns;
 

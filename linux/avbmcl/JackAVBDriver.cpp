@@ -189,7 +189,7 @@ int JackAVBDriver::Read()
     if ( cumulative_rx_int_us >  avb_ctx.period_usecs ) {
         ret = 1;
         NotifyXRun(fBeginDateUst, cumulative_rx_int_us);
-        jack_error("netxruns... duration: %fms", cumulative_rx_int_us / 1000);
+        //jack_error("netxruns... duration: %fms", cumulative_rx_int_us / 1000);
     }
 
     JackDriver::CycleTakeBeginTime();

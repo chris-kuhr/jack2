@@ -76,6 +76,12 @@ JackAVBDriver::JackAVBDriver(const char* name, const char* alias, JackLockedEngi
     monotonicTime = 0;
     preRunCnt = 3;
 
+    samplesPerAVTPPacket = sample_rate / 8000;
+    numberAVTPPackets = (int)(period_size / samplesPerAVTPPacket) +1;
+    residueSamples = period_size % samplesPerAVTPPacket;
+    float tmp_residueSamplesDuration = residueSamples / sample_rate;
+    residueSamplesDuration = tmp_residueSamplesDuration * 1000000000;
+    
     init_avb_driver( &(this->avb_ctx),
                       eth_dev,
                       stream_id,
@@ -172,11 +178,14 @@ int JackAVBDriver::Read()
     uint64_t cumulative_rx_int_ns = 0;
     int n = 0;
 
-    jack_error("period");
-    if( (cumulative_rx_int_ns = await_avtp_rx_ts( &avb_ctx, n )) == -1)
-        jack_error("error");
-    else
-        jack_error("duration: %lld", cumulative_rx_int_ns);
+    //jack_error("period");
+    if( (cumulative_rx_int_ns = await_avtp_rx_ts( &avb_ctx, n )) == -1){
+        jack_error("AVTP rx error");
+        return -1;
+    }
+    
+    
+    cumulative_rx_int_ns += this->residueSamplesDuration;
     
     this->monotonicTime += cumulative_rx_int_ns;
 

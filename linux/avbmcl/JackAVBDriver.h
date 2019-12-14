@@ -35,6 +35,10 @@ class JackAVBDriver : public JackWaiterDriver
         uint64_t            timeCompensation;
         uint64_t            monotonicTime;
         int                 preRunCnt;
+        int                 samplesPerAVTPPacket;
+        int                 numberAVTPPackets;
+        int                 residueSamples;
+        uint64_t            residueSamplesDuration;
 
     public:
         JackAVBDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,

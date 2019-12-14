@@ -184,7 +184,6 @@ int JackAVBDriver::Read()
         return -1;
     }
     
-    
     cumulative_rx_int_ns += this->residueSamplesDuration;
     jack_error("duration: %lld", cumulative_rx_int_ns);
     

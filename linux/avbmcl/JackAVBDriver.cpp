@@ -79,6 +79,7 @@ JackAVBDriver::JackAVBDriver(const char* name, const char* alias, JackLockedEngi
     samplesPerAVTPPacket = sample_rate / 8000;
     numberAVTPPackets = (int)(period_size / samplesPerAVTPPacket) +1;
     residueSamples = period_size % samplesPerAVTPPacket;
+    residueSamples /= 2;
     float tmp_residueSamplesDuration = (float)residueSamples / sample_rate;
     residueSamplesDuration = tmp_residueSamplesDuration * 1000000000;
     
@@ -191,22 +192,27 @@ int JackAVBDriver::Read()
         return -1;
     }
     
-    cumulative_rx_int_ns += this->residueSamplesDuration;
-    jack_error("duration: %lld", cumulative_rx_int_ns);
     
-    this->monotonicTime += cumulative_rx_int_ns;
+    uint64_t period_ns = (uint64_t)avb_ctx.period_usecs * 1000;
+    if ( cumulative_rx_int_ns > period_ns ) {
+        ret = 1;
+        float cumulative_rx_int_us = cumulative_rx_int_ns / 1000;
+        NotifyXRun(fBeginDateUst, cumulative_rx_int_us);
+        jack_error("netxruns... duration: %fms", cumulative_rx_int_us / 1000);
+    } else {
+        jack_error("duration: %lld", cumulative_rx_int_ns);
+        int dummy = 0;
+        for(int i = 0; i < (period_ns - cumulative_rx_int_ns); i++) 
+            dummy *= 1.1;
+    }
+    
+    this->monotonicTime += period_ns;
 
     if( this->lastPeriodDuration != 0 ){
         this->timeCompensation = cumulative_rx_int_ns - this->lastPeriodDuration;
     }
     this->lastPeriodDuration = cumulative_rx_int_ns;
 
-    float cumulative_rx_int_us = cumulative_rx_int_ns / 1000;
-    if ( cumulative_rx_int_us >  avb_ctx.period_usecs ) {
-        ret = 1;
-        NotifyXRun(fBeginDateUst, cumulative_rx_int_us);
-        jack_error("netxruns... duration: %fms", cumulative_rx_int_us / 1000);
-    }
 
     JackDriver::CycleTakeBeginTime();
 

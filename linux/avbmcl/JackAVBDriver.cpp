@@ -186,7 +186,6 @@ int JackAVBDriver::Read()
     uint64_t cumulative_rx_int_ns = 0;
     int n = 0;
 
-    //jack_error("period");
     if( (cumulative_rx_int_ns = await_avtp_rx_ts( &avb_ctx, n )) == -1){
         jack_error("AVTP rx error");
         return -1;

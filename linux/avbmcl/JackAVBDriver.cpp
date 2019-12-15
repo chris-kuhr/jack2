@@ -81,7 +81,7 @@ JackAVBDriver::JackAVBDriver(const char* name, const char* alias, JackLockedEngi
     residueSamples = period_size % samplesPerAVTPPacket;
     float tmp_residueSamplesDuration = (float)residueSamples / sample_rate;
     residueSamplesDuration = tmp_residueSamplesDuration * 1000000000;
-    audio_cycle_ns = ((float)1/sample_rate) * 1000000000;
+    audio_cycle_ns = ((float)period_size/sample_rate) * 1000000000;
     
     jack_error("Sampleing Rate = %d", sample_rate);
     jack_error("Samples per Packet = %d", samplesPerAVTPPacket);

@@ -200,7 +200,7 @@ int JackAVBDriver::Read()
         NotifyXRun(fBeginDateUst, cumulative_rx_int_us);
         jack_error("netxruns... duration: %fms", cumulative_rx_int_us / 1000);
     } else {
-        jack_error("duration: %lld", cumulative_rx_int_ns);
+        //jack_error("duration: %lld", cumulative_rx_int_ns);
         int dummy = 0;
         for(int i = 0; i < (period_ns - cumulative_rx_int_ns); i++) 
             dummy *= 1.1;

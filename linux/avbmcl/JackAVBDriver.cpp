@@ -82,6 +82,10 @@ JackAVBDriver::JackAVBDriver(const char* name, const char* alias, JackLockedEngi
     float tmp_residueSamplesDuration = residueSamples / sample_rate;
     residueSamplesDuration = tmp_residueSamplesDuration * 1000000000;
     
+    jack_error("Samples per Packet = %d", samplesPerAVTPPacket);
+    jack_error("Number of AVTP Packets = %d", numberAVTPPackets);
+    jack_error("Residue Samples = %d", residueSamples);
+    jack_error("Tmp Residue Sample Duration = %f", tmp_residueSamplesDuration);
     jack_error("Residue Sample Duration = %lld", residueSamplesDuration);
     
     init_avb_driver( &(this->avb_ctx),

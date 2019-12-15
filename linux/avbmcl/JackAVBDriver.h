@@ -39,6 +39,7 @@ class JackAVBDriver : public JackWaiterDriver
         int                 numberAVTPPackets;
         int                 residueSamples;
         uint64_t            residueSamplesDuration;
+        uint64_t            audio_cycle_ns;
 
     public:
         JackAVBDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,

@@ -31,7 +31,7 @@ int init_avb_driver(   avb_driver_state_t *avb_ctx, const char* name,
                         char* stream_id, char* destination_mac,
                         int sample_rate, int period_size, int num_periods, int adjust, int capture_ports, int playback_ports);
 int startup_avb_driver( avb_driver_state_t *avb_ctx);
-uint64_t await_avtp_rx_ts( avb_driver_state_t *avb_ctx, int packet_num );
+uint64_t await_avtp_rx_ts( avb_driver_state_t *avb_ctx, int packet_num, uint64_t *lateness );
 int shutdown_avb_driver( avb_driver_state_t *avb_ctx);
 
 #ifdef __cplusplus

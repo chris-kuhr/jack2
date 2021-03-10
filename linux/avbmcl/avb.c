@@ -483,9 +483,10 @@ int startup_avb_driver( avb_driver_state_t *avb_ctx )
     }
 }
 
-uint64_t await_avtp_rx_ts( avb_driver_state_t *avb_ctx, int packet_num )
+uint64_t await_avtp_rx_ts( avb_driver_state_t *avb_ctx, int packet_num, uint64_t *lateness )
 {
-    return avtp_mcl_wait_for_rx_ts( filepointer, &avb_ctx, &si_other_avb, &avtp_transport_socket_fds, packet_num );
+//    return avtp_mcl_wait_for_rx_ts( filepointer, &avb_ctx, &si_other_avb, &avtp_transport_socket_fds, packet_num );
+    return avtp_mcl_wait_for_rx_ts_const( filepointer, &avb_ctx, &si_other_avb, &avtp_transport_socket_fds, packet_num, lateness );
 }
 
 int shutdown_avb_driver( avb_driver_state_t *avb_ctx )

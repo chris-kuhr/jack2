@@ -38,7 +38,10 @@ uint64_t avtp_mcl_wait_for_rx_ts( FILE* filepointer, avb_driver_state_t **avb_ct
                                         struct sockaddr_in **si_other_avb,
                                         struct pollfd **avtp_transport_socket_fds,
                                         int packet_num );
-
+uint64_t avtp_mcl_wait_for_rx_ts_const( FILE* filepointer, avb_driver_state_t **avb_ctx,
+                                            struct sockaddr_in **si_other_avb,
+                                            struct pollfd **avtp_transport_socket_fds,
+                                            int packet_num, uint64_t *lateness );
 #ifdef __cplusplus
 }
 #endif

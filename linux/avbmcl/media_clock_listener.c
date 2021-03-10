@@ -175,3 +175,102 @@ uint64_t avtp_mcl_wait_for_rx_ts( FILE* filepointer, avb_driver_state_t **avb_ct
     }
     return -1;
 }
+
+
+
+
+uint64_t avtp_mcl_wait_for_rx_ts_const( FILE* filepointer, avb_driver_state_t **avb_ctx,
+                                            struct sockaddr_in **si_other_avb,
+                                            struct pollfd **avtp_transport_socket_fds,
+                                            int packet_num, uint64_t *lateness )
+{
+    char stream_packet[BUFLEN];
+
+//    struct cmsghdr {
+//        socklen_t     cmsg_len;     // data byte count, including hdr
+//        int           cmsg_level;   // originating protocol
+//        int           cmsg_type;    // protocol-specific type
+//        // followed by unsigned char cmsg_data[];
+//    };
+//
+//    struct msghdr {
+//        void         *msg_name;       // optional address
+//        socklen_t     msg_namelen;    // size of address
+//        struct iovec *msg_iov;        // scatter/gather array
+//        size_t        msg_iovlen;     // # elements in msg_iov
+//        void         *msg_control;    // ancillary data, see below
+//        size_t        msg_controllen; // ancillary data buffer len
+//        int           msg_flags;      // flags on received message
+//    };
+
+    struct msghdr msg;
+    struct cmsghdr *cmsg;
+    struct sockaddr_ll remote;
+    struct iovec sgentry;
+    struct {
+        struct cmsghdr cm;
+        char control[256];
+    } control;
+
+    memset( &msg, 0, sizeof( msg ));
+    msg.msg_iov = &sgentry;
+    msg.msg_iovlen = 1;
+    sgentry.iov_base = stream_packet;
+    sgentry.iov_len = BUFLEN;
+
+    memset( &remote, 0, sizeof(remote));
+    msg.msg_name = (caddr_t) &remote;
+    msg.msg_namelen = sizeof( remote );
+    msg.msg_control = &control;
+    msg.msg_controllen = sizeof(control);
+
+    int status = recvmsg((*avtp_transport_socket_fds)->fd, &msg, 0);//NULL);
+
+    if (status == 0) {
+        fprintf(filepointer, "EOF\n");fflush(filepointer);
+        return -1;
+    } else if (status < 0) {
+        fprintf(filepointer, "Error recvmsg: %d %d %s\n", status, errno, strerror(errno));fflush(filepointer);
+        return -1;
+    }
+    if( // Compare Stream IDs
+        ((*avb_ctx)->streamid8[0] == (uint8_t) stream_packet[18]) &&
+        ((*avb_ctx)->streamid8[1] == (uint8_t) stream_packet[19]) &&
+        ((*avb_ctx)->streamid8[2] == (uint8_t) stream_packet[20]) &&
+        ((*avb_ctx)->streamid8[3] == (uint8_t) stream_packet[21]) &&
+        ((*avb_ctx)->streamid8[4] == (uint8_t) stream_packet[22]) &&
+        ((*avb_ctx)->streamid8[5] == (uint8_t) stream_packet[23]) &&
+        ((*avb_ctx)->streamid8[6] == (uint8_t) stream_packet[24]) &&
+        ((*avb_ctx)->streamid8[7] == (uint8_t) stream_packet[25])
+    ){
+        uint64_t adjust_packet_time_ns = 0;
+        uint64_t packet_arrival_time_ns = 0;
+
+        // Packet Arrival Time from Device
+        cmsg = CMSG_FIRSTHDR(&msg);
+        while( cmsg != NULL ) {
+            if( cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type == SO_TIMESTAMPING ) {
+                struct timespec *ts_device, *ts_system;
+                ts_system = ((struct timespec *) CMSG_DATA(cmsg)) + 1;
+                ts_device = ts_system + 1;
+                packet_arrival_time_ns =  (ts_device->tv_sec*1000000000LL + ts_device->tv_nsec);
+                if( ts_cnt < NUM_TS )
+                    timestamps[ts_cnt++] = packet_arrival_time_ns;
+                break;
+            }
+            cmsg = CMSG_NXTHDR(&msg,cmsg);
+        }
+
+        (*lateness) += ( packet_arrival_time_ns - last_packet_time_ns ) - 125000;
+        last_packet_time_ns = packet_arrival_time_ns;
+
+        if( packet_num == (*avb_ctx)->num_packets -1){
+            adjust_packet_time_ns = (uint64_t) ( ( (float)((*avb_ctx)->period_size % 6 ) / (float)(*avb_ctx)->sample_rate ) * 1000000000LL);
+        } else {
+            adjust_packet_time_ns = 125000;
+        }
+        return adjust_packet_time_ns -1000;
+    }
+    return -1;
+}
+
